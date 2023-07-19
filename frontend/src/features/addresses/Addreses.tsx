@@ -33,6 +33,7 @@ const Addresses: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
 
+  // test google map
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const currentMap = useSelector((state: RootState) => state.map.currentMap)
   const handleOpenSocket = useCallback(() => {
