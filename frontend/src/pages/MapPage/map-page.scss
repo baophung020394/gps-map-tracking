@@ -1,0 +1,14 @@
+@import '../../assets/styles/app.scss';
+
+.map-page {
+  display: flex;
+
+  &__maps {
+    flex: 1;
+  }
+  &__sidebar {
+    max-width: 400px;
+    border-left: 1px solid $color-a5a5a5;
+    width: 100%;
+  }
+}

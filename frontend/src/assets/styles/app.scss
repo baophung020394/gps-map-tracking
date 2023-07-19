@@ -1,0 +1,102 @@
+$bg-color: #ffffff;
+
+/*
+* VARIABLES COLORS
+*/
+
+$primary-color: #000000;
+$secondary-color: #2b76ff;
+$heading-color: '';
+$placeholder-color: #f6f6f6;
+$border-color: #f6f6f6;
+$white: #ffffff;
+$color-a5a5a5: #a5a5a5;
+$color-bcbcbc: #bcbcbc;
+$color-f6f6f6: #f6f6f6;
+$color-f7f7f7: #f7f7f7;
+$color-dbdbdb: #dbdbdb;
+$color-da2bff: #da2bff;
+$color-ffffffe3: #ffffffe3;
+$color-565656: #565656;
+$color-7b7b7b: #7b7b7b;
+/*
+* VARIABLES FONTS
+*/
+
+$font-10: 10px;
+$font-12: 12px;
+$font-14: 14px;
+$font-16: 16px;
+$font-18: 18px;
+$font-20: 20px;
+$font-24: 24px;
+$font-26: 26px;
+$font-28: 28px;
+$font-30: 30px;
+$font-32: 32px;
+$font-34: 34px;
+$font-36: 36px;
+$font-40: 40px;
+$font-44: 44px;
+$font-52: 52px;
+$font-56: 56px;
+$font-60: 60px;
+$font-72: 72px;
+
+/*
+* VARIABLES FONT-WEIGHT
+*/
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semi-bold: 600;
+$font-weight-bold: 700;
+
+/*
+* VARIABLES LINE-HEIGHT
+* > 40px 1.2, < 40px 1.33
+*/
+$line-height-12: 1.2;
+$line-height-13: 1.33;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: $bg-color;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/*
+* Elements
+*/
+button,
+a,
+p,
+span,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Poppins', sans-serif !important;
+  line-height: $line-height-12;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+#root {
+  height: 100%;
+}
