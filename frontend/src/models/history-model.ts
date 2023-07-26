@@ -4,4 +4,5 @@ export interface HistoryModel {
   address?: string
   latitude: number
   longitude: number
+  date: string
 }

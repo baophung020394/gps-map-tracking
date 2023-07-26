@@ -2,13 +2,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userReducer from './userSlice'
 import mapReducer from './mapSlice'
-import addressReducer from './addressSlice'
+import deviceReducer from './deviceSlice'
 
 const store = configureStore({
   reducer: {
     user: userReducer,
     map: mapReducer,
-    address: addressReducer
+    device: deviceReducer
   }
 })
 

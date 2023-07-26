@@ -1,6 +1,6 @@
-import RequestSocket from '@models/Common'
 import { useCallback, useEffect, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
+import RequestSocket from 'src/models/Common'
 
 export type SocketResponse<T> = {
   ptCommand: number // event
@@ -18,7 +18,7 @@ interface SocketOptions<T> {
   onMessage: (message: SocketResponse<T>) => void
 }
 
-export const useSocketIO = <T>(socketUrl: string, options: SocketOptions<T>) => {
+export const useSocketIO = <T>(socketUrl: string, options: SocketOptions<T>, token: string) => {
   const [socket, setSocket] = useState<Socket | null>(null)
   const [lastMessage, setLastMessage] = useState<SocketResponse<T> | null>(null)
 
@@ -34,7 +34,11 @@ export const useSocketIO = <T>(socketUrl: string, options: SocketOptions<T>) => 
   }, [socket])
 
   useEffect(() => {
-    const socketIO = io(socketUrl)
+    const socketIO = io(socketUrl, {
+      auth: {
+        token: token
+      }
+    })
 
     setSocket(socketIO)
 
@@ -51,7 +55,7 @@ export const useSocketIO = <T>(socketUrl: string, options: SocketOptions<T>) => 
     return () => {
       socketIO.disconnect()
     }
-  }, [socketUrl, options])
+  }, [socketUrl, options, token])
 
   return {
     sendSocketMessage,

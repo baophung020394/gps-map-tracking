@@ -1,4 +1,4 @@
-import Addreses from '@features/addresses/Addreses'
+import Addreses from '@features/devices/devices'
 import Map from '@features/maps/Map'
 import { Box } from '@mui/material'
 import './map-page.scss'

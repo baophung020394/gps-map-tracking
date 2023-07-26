@@ -1,0 +1,304 @@
+import { Server } from "socket.io";
+import { Socket } from "socket.io";
+import {
+  DeviceCommand,
+  GROUP_DEVICE,
+  GROUP_MESSAGE_CHAT,
+  GROUP_MESSAGE_LIST,
+  MessageCommand,
+} from "../constants/message-constant";
+import { Device, History, HistoryLast, Latest } from "../models";
+import { MessageMessage, SocketMessage } from "../models/channel-model";
+const { Op } = require("sequelize");
+
+let io: Server;
+
+export const initSocketServer = (httpServer: any) => {
+  io = new Server(httpServer, {
+    cors: {
+      origin: "*",
+    },
+  });
+  const rooms: Record<string, { users: string[]; messages: MessageMessage[] }> =
+    {};
+
+  io.on("connection", (socket: Socket) => {
+    console.log(`Client ${socket.id} connected`);
+
+    // Handle 'message' event
+    socket.on("message", async (data: SocketMessage, callback) => {
+      console.log(`Received message event with data: ${JSON.stringify(data)}`);
+      let result: any = undefined;
+      let type = undefined;
+      // Do something based on ptCommand
+      switch (data.ptGroup) {
+        case GROUP_DEVICE:
+          switch (data.ptCommand) {
+            case DeviceCommand.DEVICE_LIST:
+              console.log("Đã nhận ptGroup", data);
+              const devices = await Device.findAll({
+                include: [
+                  {
+                    model: History,
+                    attributes: ["date", "address", "latitude", "longitude"],
+                    // as: "addresses",
+                  },
+                ],
+                order: [[History, "date", "DESC"]],
+              });
+              result = devices;
+              type = "array";
+              break;
+
+            case DeviceCommand.DEVICE_LATEST_LIST:
+              console.log("Đã nhận ptGroup", data);
+              // Lấy danh sách tất cả thiết bị dựa vào bảng Latest
+              const latestDevices = await Latest.findAll({
+                attributes: ["deviceId"],
+              });
+
+              // Lấy danh sách các thiết bị từ bảng Device
+              const deviceList = await Device.findAll({
+                where: {
+                  deviceId: {
+                    [Op.in]: latestDevices.map((device) => device.deviceId),
+                  },
+                },
+                include: [
+                  {
+                    model: Latest,
+                    attributes: ["date", "address", "latitude", "longitude"],
+                    // as: "addresses",
+                  },
+                ],
+                order: [[Latest, "date", "DESC"]],
+              });
+              result = deviceList;
+              type = "array";
+              break;
+
+            case DeviceCommand.DEVICE_LIST_LAST:
+              // Handle get address last list
+              try {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                const addressesLast = await Device.findAll({
+                  include: [
+                    {
+                      model: HistoryLast,
+                      attributes: ["date", "address", "latitude", "longitude"],
+                      // as: "addresses",
+                      where: {
+                        date: {
+                          [Op.gte]: thirtyDaysAgo,
+                        },
+                      },
+                      required: true,
+                    },
+                  ],
+                  order: [[HistoryLast, "date", "DESC"]],
+                });
+
+                result = addressesLast;
+                type = "array";
+              } catch (error) {
+                console.error("Error:", error);
+              }
+
+              break;
+
+            case DeviceCommand.EDIT_DEVICE:
+              // Handle 'editChannel' here
+              // ...
+              break;
+
+            case DeviceCommand.DELETE_DEVICE:
+              // Handle 'deleteChannel' here
+              // ...
+              break;
+
+            default:
+              console.log(
+                `Unknown ptCommand: ${(data as SocketMessage).ptCommand}`
+              );
+              break;
+          }
+          break;
+
+        case GROUP_MESSAGE_LIST:
+          const roomId = data.roomId;
+          switch (data.ptCommand) {
+            case MessageCommand.CREATE_ROOM:
+              if (roomId) {
+                if (!rooms[roomId]) {
+                  rooms[roomId] = { users: [], messages: [] };
+                }
+                socket.join(roomId);
+              }
+              break;
+
+            case MessageCommand.JOIN_ROOM:
+              if (roomId) {
+                socket.join(roomId);
+                if (rooms[roomId]) {
+                  rooms[roomId].users.push(socket.id);
+                }
+              }
+              break;
+
+            case MessageCommand.LEAVE_ROOM:
+              if (roomId) {
+                socket.leave(roomId);
+                if (rooms[roomId]) {
+                  const index = rooms[roomId].users.indexOf(socket.id);
+                  if (index > -1) {
+                    rooms[roomId].users.splice(index, 1);
+                  }
+                }
+              }
+
+              break;
+
+            case MessageCommand.FETCH_MESSAGES:
+              if (roomId) {
+                if (rooms[roomId]) {
+                  socket.emit("roomMessages", rooms[roomId].messages);
+                }
+              }
+              break;
+
+            default:
+              console.log(`Unknown MessageCommand: ${data.ptCommand}`);
+              break;
+          }
+
+          break;
+        case GROUP_MESSAGE_CHAT:
+          switch (data.ptCommand) {
+            case MessageCommand.SEND_MESSAGE:
+              if (roomId) {
+                const message: MessageMessage = {
+                  ptCommand: data.ptCommand,
+                  ptGroup: data.ptGroup,
+                  result: data.result,
+                  message: data.message || "",
+                  attachment: data.attachment || "",
+                  messageType: data.messageType || "0",
+                  chatType: data.chatType,
+                  txtType: data.txtType,
+                  ownerId: data.senderId,
+                  staffMsg: data.staffMsg,
+                  title: data.title,
+                  attachment_more: "",
+                  email_crtfc: "",
+                  reg_date: data.reg_date,
+                  regDate: data.regDate,
+                  senderName: data.senderName,
+                  senderId: data.senderId,
+                  message_more: "",
+                  blinded: "",
+                  cId: "",
+                };
+
+                if (rooms[roomId]) {
+                  rooms[roomId].messages.push(message);
+                  io.to(roomId).emit("message", message);
+                }
+              }
+              break;
+
+            default:
+              console.log(`Unknown MessageCommand: ${data.ptCommand}`);
+              break;
+          }
+          break;
+      }
+
+      // switch (data.ptGroup) {
+      //   case GROUP_CHANNEL:
+
+      //   case GROUP_MESSAGE:
+      //     // Handle messages for ptGroup MESSAGE_GROUP_MESSAGE here
+      //     // ...
+      //     break;
+      // case 12346: // If this is an 'addressList' message...
+      //   // Handle 'addressList' here
+      //   console.log("Đã nhận ptGroup", data);
+      //   const addresses = await Device.findAll({
+      //     include: [
+      //       {
+      //         model: History,
+      //         attributes: ["date", "address", "latitude", "longitude"],
+      //       },
+      //     ],
+      //     order: [[History, "date", "DESC"]],
+      //   });
+      //   result = addresses;
+      //   type = "array";
+      //   break;
+
+      //     // case 12347:
+      // try {
+      //   const thirtyDaysAgo = new Date();
+      //   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      //   const addressesLast = await Device.findAll({
+      //     include: [
+      //       {
+      //         model: HistoryLast,
+      //         attributes: ["date", "address", "latitude", "longitude"],
+      //         where: {
+      //           date: {
+      //             [Op.gte]: thirtyDaysAgo,
+      //           },
+      //         },
+      //         required: true,
+      //       },
+      //     ],
+      //     order: [[HistoryLast, "date", "DESC"]],
+      //   });
+
+      //   result = addressesLast;
+      //   type = "array";
+      // } catch (error) {
+      //   console.error("Error:", error);
+      // }
+
+      // break;
+
+      //     // case 22345:
+      //     type = "object";
+      //     break;
+
+      //   default:
+      //     console.log(`Unknown ptCommand: ${data}`);
+      // }
+
+      // Then, send a response back to the client
+
+      const response = {
+        ptCommand: data.ptCommand,
+        ptGroup: data.ptGroup,
+        result: "success",
+        status: 200,
+        count: type === "array" ? result?.length : undefined,
+        data: result, // Replace with actual data
+      };
+
+      socket.emit("message", response);
+
+      if (typeof callback === "function") {
+        callback(response);
+      }
+    });
+  });
+};
+
+export const getSocketServer = () => {
+  if (!io) {
+    throw new Error("Socket.io server is not initialized");
+  }
+
+  return io;
+};

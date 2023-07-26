@@ -17,14 +17,14 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      // "*": ["src/*"]
       "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
+      "@stores/*": ["src/stores/*"],
       "@features/*": ["src/features/*"],
-      "@models/*": ["src/models/*"],
       "@apis/*": ["src/apis/*"],
       "@hooks/*": ["src/hooks/*"],
-      "@stores/*": ["src/stores/*"]
+      "@constant/*": ["src/constant/*"],
+      "@types/react-hook-form": ["node_modules/@types/react-hook-form"]
     }
   },
   "include": ["src"]

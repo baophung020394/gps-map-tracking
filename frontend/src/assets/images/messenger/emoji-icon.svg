@@ -1,0 +1,9 @@
+<svg id="emoji_L-icon" data-name="emoji L-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+  <rect id="Rectangle_4024" data-name="Rectangle 4024" width="28" height="28" fill="none"/>
+  <g id="emoji" transform="translate(2.333 2.333)">
+    <path id="Path_2514" data-name="Path 2514" d="M9.061,12.242a1.061,1.061,0,0,0,1.061-1.061V9.061A1.061,1.061,0,0,0,8,9.061v2.121A1.061,1.061,0,0,0,9.061,12.242Z" transform="translate(-0.576 -0.576)" fill="#7b7b7b"/>
+    <path id="Path_2515" data-name="Path 2515" d="M15.061,12.242a1.061,1.061,0,0,0,1.061-1.061V9.061a1.061,1.061,0,1,0-2.121,0v2.121A1.061,1.061,0,0,0,15.061,12.242Z" transform="translate(-0.212 -0.576)" fill="#7b7b7b"/>
+    <path id="Path_2516" data-name="Path 2516" d="M15.723,14.39a4.242,4.242,0,0,1-6.841,0,1.061,1.061,0,0,0-1.644,1.341,6.364,6.364,0,0,0,10.129,0,1.061,1.061,0,0,0-1.644-1.341Z" transform="translate(-0.636 -0.212)" fill="#7b7b7b"/>
+    <path id="Path_2517" data-name="Path 2517" d="M12.667,1A11.667,11.667,0,1,0,24.333,12.667,11.667,11.667,0,0,0,12.667,1Zm0,21.212a9.545,9.545,0,1,1,9.545-9.545A9.545,9.545,0,0,1,12.667,22.212Z" transform="translate(-1 -1)" fill="#7b7b7b"/>
+  </g>
+</svg>

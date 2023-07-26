@@ -1,0 +1,62 @@
+@import '../../assets/styles/app.scss';
+
+.addresses {
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  &--header {
+    position: sticky;
+    top: 0;
+    background-color: $white;
+    &__form {
+      padding: 16px 0;
+      .input-form {
+        margin-bottom: 16px;
+      }
+    }
+
+    &__option {
+      padding: 16px;
+      box-sizing: border-box;
+      .btn-add {
+        margin-right: 16px;
+        margin-bottom: 8px;
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  &--address {
+    padding: 16px;
+    border-bottom: 1px solid $color-dbdbdb;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:last-child {
+      border-bottom: unset;
+    }
+
+    p {
+      font-size: $font-16;
+      color: $primary-color;
+      font-weight: $font-weight-medium;
+      line-height: $line-height-12;
+      margin-bottom: 8px;
+    }
+
+    span {
+      font-size: $font-16;
+      color: $primary-color;
+      font-weight: $font-weight-light;
+      line-height: $line-height-12;
+      margin-left: 8px;
+      &.status {
+        color: green;
+      }
+    }
+  }
+}

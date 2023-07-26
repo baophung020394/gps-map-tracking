@@ -2,24 +2,16 @@ require("dotenv").config();
 import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import addressRoutes from "./routes/address";
 import * as redis from "redis";
 import { promisify } from "util";
-import * as addressesController from "./controllers/addressesController";
+import * as devicesController from "./controllers/devicesController";
+import * as authController from "./controllers/authController";
 import { createServer } from "http";
-import { initSocketServer } from "./socket";
-import { Server } from "http";
-import { Server as SocketIOServer, Socket } from "socket.io";
+import { initSocketServer } from "./socket/index";
+import jwt from "jsonwebtoken";
 
 // Khởi tạo Redis client
-const redisHost = process.env.REDIS_HOST || "localhost";
-const redisPort = process.env.REDIS_PORT || 6379;
-const redisPassword = process.env.REDIS_PASSWORD || undefined;
-
-// Khởi tạo Redis client
-
 const app = express();
-// const server = new Server(app);
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -34,26 +26,83 @@ const redisClient = redis.createClient({
 redisClient.connect();
 
 // Promisify Redis client functions
-const getAsync = promisify(redisClient.get).bind(redisClient);
-const setexAsync = promisify(redisClient.setEx).bind(redisClient);
-const delAsync = promisify(redisClient.del).bind(redisClient);
+export const getAsync = promisify(redisClient.get).bind(redisClient);
+export const setexAsync = promisify(redisClient.setEx).bind(redisClient);
+export const delAsync = promisify(redisClient.del).bind(redisClient);
+export const router = express.Router();
 
-// Middleware để cache dữ liệu từ Redis
-const cacheMiddleware = async (
+const expiredTokens: { [token: string]: number } = {};
+const JWT_SECRET = process.env.JWT_SECRET || "keysecret";
+
+// Middleware xác thực token từ Redis
+// export const authenticateToken = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const token = req.headers["authorization"];
+
+//   if (!token) return res.sendStatus(401);
+
+//   try {
+//     const sessionExists = await getAsync(token);
+//     console.log("sessionExists", sessionExists);
+//     if (sessionExists) {
+//       next();
+//     } else {
+//       res.sendStatus(403);
+//     }
+//   } catch (error: unknown) {
+//     console.error(error as Error);
+//     return res.sendStatus(403);
+//   }
+// };
+
+export const authenticateToken = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { addressId } = req.params;
+  const token = req.headers["authorization"];
+
+  if (!token) return res.sendStatus(401);
+
+  // Kiểm tra xem token có trong danh sách token hết hạn chưa
+  const expirationTime = expiredTokens[token];
+  if (expirationTime && Date.now() < expirationTime) {
+    // Token hết hạn, từ chối truy cập
+    return res.sendStatus(403);
+  }
+
+  try {
+    // Kiểm tra token bằng cách giải mã nó
+    jwt.verify(token, JWT_SECRET);
+    // Token hợp lệ, cho phép truy cập
+    next();
+  } catch (error: unknown) {
+    console.error(error as Error);
+    // Token không hợp lệ, từ chối truy cập và đánh dấu nó là token hết hạn
+    expiredTokens[token] = Date.now() + 30 * 1000; // Thêm 30 giây vào thời gian hiện tại
+    return res.sendStatus(403);
+  }
+};
+
+// Middleware để cache dữ liệu từ Redis
+export const cacheMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { deviceId } = req.params;
 
   try {
     // Kiểm tra xem dữ liệu đã được lưu trong Redis chưa
-    const data = await getAsync(addressId);
+    const data = await getAsync(deviceId);
 
     if (data !== null) {
       // Dữ liệu đã tồn tại trong Redis
-      const address = JSON.parse(data);
-      return res.status(200).json({ address });
+      const device = JSON.parse(data);
+      return res.status(200).json({ device });
     }
 
     // Dữ liệu chưa tồn tại trong Redis, chuyển tiếp tới middleware tiếp theo
@@ -64,19 +113,16 @@ const cacheMiddleware = async (
   }
 };
 
-// Đăng ký middleware cache cho route lấy thông tin địa chỉ bằng ID
-app.get(
-  "/api/addresses/:addressId",
-  cacheMiddleware,
-  addressesController.getAddressById
-);
-
 // Khi tạo hoặc cập nhật địa chỉ, hãy xóa bỏ dữ liệu cache tương ứng trong Redis
-const clearCache = async (req: Request, res: Response, next: NextFunction) => {
-  const { addressId } = req.params;
+export const clearCache = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { deviceId } = req.params;
 
   try {
-    await delAsync(addressId);
+    await delAsync(deviceId);
 
     // Chuyển tiếp tới middleware tiếp theo
     next();
@@ -86,10 +132,44 @@ const clearCache = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// Đăng ký middleware xóa cache cho các route tạo và cập nhật địa chỉ
-app.post("/api/addresses", addressesController.createAddress, clearCache);
-// Đăng ký middleware xóa cache cho route lấy danh sách địa chỉ
-app.get("/api/addresses", addressesController.getAllAddresses, clearCache);
+// app.use(authenticateToken, cacheMiddleware, clearCache);
+// app.use(authenticateToken);
+app.post("/api/register", authController.register);
+app.post("/api/login", authController.login);
+app.post("/api/devices", authenticateToken, devicesController.createDevice);
+app.get("/api/devices", authenticateToken, devicesController.getAllDevices);
+app.post(
+  "/api/updatePosition",
+  authenticateToken,
+  devicesController.updatePositionLatest
+);
+app.post(
+  "/api/devices/:addressId",
+  authenticateToken,
+  devicesController.getAllAddressByDeviceId
+);
+
+app.delete(
+  "/api/delDevice",
+  authenticateToken,
+  devicesController.deleteDeviceData
+);
+app.delete(
+  "/api/delHisttory",
+  authenticateToken,
+  devicesController.deleteHistoryData
+);
+app.delete(
+  "/api/delHisttoryLast",
+  authenticateToken,
+  devicesController.deleteHistoryLastData
+);
+app.delete(
+  "/api/delLatest",
+  authenticateToken,
+  devicesController.deleteLatestData
+);
+app.get("/api/latest", authenticateToken, devicesController.getLatestDevices);
 
 const port = process.env.PORT || 5005;
 

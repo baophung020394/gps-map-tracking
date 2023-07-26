@@ -8,6 +8,7 @@ interface FormData {
   address: string
   latitude: number
   longitude: number
+  userId: string
   date: Date
 }
 

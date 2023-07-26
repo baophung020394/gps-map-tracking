@@ -32,11 +32,11 @@ module.exports = (env, argv) => {
         // Thay vì: import Login from '../pages/Login' chẳng hạn
         '@pages': path.resolve(__dirname, './src/pages'),
         '@components': path.resolve(__dirname, './src/components'),
+        '@stores': path.resolve(__dirname, './src/stores'),
         '@features': path.resolve(__dirname, './src/features'),
-        '@models': path.resolve(__dirname, './src/models'),
         '@apis': path.resolve(__dirname, './src/apis'),
         '@hooks': path.resolve(__dirname, './src/hooks'),
-        '@stores': path.resolve(__dirname, './src/stores')
+        '@constant': path.resolve(__dirname, './src/constant')
       }
     },
 

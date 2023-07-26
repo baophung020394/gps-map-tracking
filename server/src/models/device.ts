@@ -4,6 +4,7 @@ import { History, HistoryLast } from ".";
 interface DeviceAttributes extends Model {
   deviceId: number;
   name: string;
+  userId: string;
 }
 
 export default (sequelize: Sequelize) => {
@@ -14,6 +15,9 @@ export default (sequelize: Sequelize) => {
       autoIncrement: true,
     },
     name: DataTypes.STRING,
+    userId: {
+      type: DataTypes.INTEGER,
+    },
   });
 
   return Device;

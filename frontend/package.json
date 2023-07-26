@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^1.9.5",
     "@types/redux": "^3.6.0",
     "axios": "^1.4.0",
+    "date-fns": "^2.30.0",
     "leaflet": "^1.9.4",
     "leaflet-geosearch": "^3.8.0",
     "leaflet-routing-machine": "^3.2.12",
