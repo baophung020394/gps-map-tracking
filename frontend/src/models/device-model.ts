@@ -2,7 +2,7 @@ import { HistoryModel } from './history-model'
 
 export interface DeviceModel {
   deviceId: string
-  name: string
+  deviceName: string
   address: string
   latitude: number
   longitude: number
@@ -10,7 +10,7 @@ export interface DeviceModel {
   Histories: HistoryModel[]
   HistoryLasts: HistoryModel[]
   Latests: HistoryModel[]
-  // addresses: HistoryModel[]
+  date?: Date
 }
 export interface DeviceRequest {
   name: string

@@ -25,6 +25,7 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
   const userInfo: UserParams | null = userJSON !== null ? JSON.parse(userJSON) : null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [listPath, setListPath] = useState<any>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
   console.log('deviceList', deviceList)
 
@@ -34,7 +35,6 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
       role: userInfo?.role
     })
     setListPath(delDevice.data.devices)
-    console.log('delDevice', delDevice)
   }
 
   useEffect(() => {
@@ -42,7 +42,6 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log('listPath', listPath)
   useEffect(() => {
     if (!mapRef.current) return // return if div not loaded yet
     // Initialize the map
@@ -98,6 +97,16 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
           const marker = L.marker(latlng, { icon: customIcon }).addTo(map)
           coordinates.push(latlng)
           markersRef.current.push(marker)
+
+          // Add click event to the marker to show popup
+          marker.on('click', () => {
+            // Create the content for the popup
+            const popupContent = `Thông tin của marker: ${maps.address} <br> Lat: ${maps.latitude} <br> Long: ${maps.longitude}`
+
+            // Create a popup and open it at the marker's location
+            const popup = L.popup().setLatLng(latlng).setContent(popupContent)
+            map.openPopup(popup)
+          })
         })
       }
     })
@@ -121,7 +130,7 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
     })
   }, [dispatch, listPath])
 
-  return <Box ref={mapRef} width='100%' height='100%' />
+  return <Box ref={mapRef} width='100%' height='100%'></Box>
 }
 
 export default MapDetail

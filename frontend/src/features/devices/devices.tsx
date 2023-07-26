@@ -277,11 +277,24 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
       <Box className='addresses--header'>
         <Box className='addresses--header__option'>
           <h1>Devices: {deviceList.length}</h1>
-          <CustomButton text='Add' onClick={handleOpen} className='btn-add' />
-          <CustomButton text='30d' onClick={handleQueryLast} className='btn-add' />
-          <CustomButton text='Reset list' onClick={handleReset} className='btn-add' />
-          <CustomButton text='Reset Data' onClick={handleDeleteAllData} className='btn-add' />
-          {id ? <CustomButton text='Update position' onClick={handleUpdatePositionById} className='btn-add' /> : null}
+          <CustomButton
+            text='Logout'
+            onClick={() => {
+              localStorage.clear()
+              window.location.href = '/login'
+            }}
+            className='btn-add'
+          />
+          {id ? (
+            <CustomButton text='Update position' onClick={handleUpdatePositionById} className='btn-add' />
+          ) : (
+            <>
+              <CustomButton text='Add' onClick={handleOpen} className='btn-add' />
+              <CustomButton text='30d' onClick={handleQueryLast} className='btn-add' />
+              <CustomButton text='Reset list' onClick={handleReset} className='btn-add' />
+              <CustomButton text='Reset Data' onClick={handleDeleteAllData} className='btn-add' />
+            </>
+          )}
         </Box>
         {/* Component popup hiển thị lên khi bấm CustomButton */}
         <Dialog open={open} onClose={handleClose}>

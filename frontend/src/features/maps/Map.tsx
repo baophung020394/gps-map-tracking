@@ -126,7 +126,7 @@ const Map: React.FC = () => {
         // Ví dụ, bạn có thể gửi một action để cập nhật Redux store với dữ liệu marker được chọn.
         const device = deviceList[index]
         if (device) {
-          navigate(`/maps/${device.id}`)
+          navigate(`/maps/${device.deviceId}`)
         }
       })
     })
