@@ -1,5 +1,4 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
-import { v4 as uuidv4 } from "uuid";
 
 interface RoomAttributes extends Model {
   id: string;
@@ -11,13 +10,27 @@ interface RoomAttributes extends Model {
   users: string[];
 }
 
+function generateRandomString() {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomString = "";
+  const length = 24;
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+
+  return randomString;
+}
+
 export default (sequelize: Sequelize) => {
   const Room = sequelize.define<RoomAttributes>(
     "Room",
     {
       id: {
         type: DataTypes.UUID, // Sử dụng kiểu UUID cho cột id
-        defaultValue: () => uuidv4(), // Tạo giá trị mặc định là UUID ngẫu nhiên khi thêm mới bản ghi
+        defaultValue: () => generateRandomString(), // Tạo giá trị mặc định là UUID ngẫu nhiên khi thêm mới bản ghi
         primaryKey: true,
       },
       roomName: {
