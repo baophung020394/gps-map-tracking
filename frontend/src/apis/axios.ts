@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:5005/api'
+  baseURL: 'http://192.168.64.10:5005/api'
 })
 
 axiosClient.interceptors.request.use(
