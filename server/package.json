@@ -21,7 +21,6 @@
     "redis": "^4.6.7",
     "sequelize": "^6.32.1",
     "socket.io": "^4.7.1",
-    "uuidv4": "^6.2.13",
     "ws": "^8.13.0"
   },
   "devDependencies": {
