@@ -43,6 +43,24 @@ export interface MessageContent {
   userId: string | undefined
 }
 
+export interface SocketResponseMessage<T> {
+  ptCommand: number // event
+  ptGroup: number // address
+  result: string
+  status: number
+  roomId: string
+  data: T[]
+}
+
+export interface RoomModel {
+  userId?: string
+  roomId: string
+  roomName: string
+  roomProfileImage?: string
+  roomDescription?: string
+  inRoom?: boolean
+}
+
 interface ChatsListResponse<T> {
   count?: number
   ptCommand: number

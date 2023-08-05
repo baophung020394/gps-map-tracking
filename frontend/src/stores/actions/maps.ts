@@ -42,8 +42,13 @@ export const updatePositionLatest = createAsyncThunk<void, DeviceUpdateRequest, 
       }
 
       // Dispatch setUser action to update the user state
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error(error) // Log the error to see more details
+      if (error.message === 'Request failed with status code 403' && error.response.status === 403) {
+        localStorage.clear()
+        window.location.href = '/'
+      }
       return thunkAPI.rejectWithValue('Failed to send')
     }
   }

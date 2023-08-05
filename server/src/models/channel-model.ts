@@ -24,7 +24,7 @@ export interface DeviceLatestListMessage {
   ptCommand: DeviceCommand.DEVICE_LATEST_LIST;
   ptGroup: typeof GROUP_DEVICE;
   roomId?: string;
-  data: UserParams;
+  params: UserParams;
 }
 
 export interface DeviceListMessage {
@@ -74,6 +74,21 @@ export interface AuthLogoutMessage {
   roomId?: string;
 }
 
+export interface MessageRoomModel {
+  userId?: string;
+  roomId: string;
+  roomName: string;
+  roomProfileImage?: string;
+  roomDescription?: string;
+}
+
+export interface MessageRoomResponse {
+  ptCommand: any;
+  ptGroup: typeof GROUP_MESSAGE_LIST;
+  roomId?: string;
+  params?: MessageRoomModel | Record<string, unknown>;
+}
+
 export interface MessageMessage {
   ptCommand: any; // You can define the type for this as needed
   ptGroup: typeof GROUP_MESSAGE_CHAT;
@@ -109,6 +124,15 @@ export interface MessageListMessage {
   params?: MessageMessage[] | Record<string, unknown>;
 }
 
+export interface MessageListMessage {
+  ptCommand: any; // You can define the type for this as needed
+  ptGroup: typeof GROUP_MESSAGE_LIST;
+  roomId?: string;
+  count?: number;
+  result?: string;
+  params?: MessageMessage[] | Record<string, unknown>;
+}
+
 export type SocketMessage =
   | AuthLoginMessage
   | AuthLogoutMessage
@@ -118,5 +142,6 @@ export type SocketMessage =
   | AddDeviceMessage
   | EditDeviceMessage
   | DeleteDeviceMessage
+  | MessageRoomResponse
   | MessageListMessage
   | MessageMessage;

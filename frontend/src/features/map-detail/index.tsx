@@ -1,13 +1,13 @@
 import axiosClient from '@apis/axios'
 import { Box } from '@mui/material'
-import { AppDispatch, RootState } from '@stores/index'
+import { AppDispatch } from '@stores/index'
 import { setCurrentMap } from '@stores/mapSlice'
 import L from 'leaflet'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch'
 import 'leaflet-geosearch/dist/geosearch.css'
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { DeviceModel } from 'src/models/device-model'
 import { UserParams } from 'src/models/User'
 import MarkerIcon from '../../assets/images/location-pin.png'
@@ -20,21 +20,30 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
   const markersRef = useRef<L.Marker[]>([])
   const dispatch = useDispatch<AppDispatch>()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deviceList = useSelector((state: RootState) => state.device.deviceList)
+
   const userJSON: string | null = localStorage.getItem('user')
   const userInfo: UserParams | null = userJSON !== null ? JSON.parse(userJSON) : null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [listPath, setListPath] = useState<any>([])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-  console.log('deviceList', deviceList)
-
   const initListAddressById = async () => {
-    const delDevice = await axiosClient.post(`/devices/${id}`, {
-      userId: userInfo?.id,
-      role: userInfo?.role
-    })
-    setListPath(delDevice.data.devices)
+    try {
+      const delDevice = await axiosClient.post(`/devices/${id}`, {
+        userId: userInfo?.id,
+        role: userInfo?.role,
+        deviceId: id
+      })
+      console.log('delDevice', delDevice)
+      setListPath(delDevice.data.devices)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log('error', error)
+      if (error.message === 'Request failed with status code 403' && error.response.status === 403) {
+        localStorage.clear()
+        window.location.href = '/'
+      }
+    }
   }
 
   useEffect(() => {
@@ -120,15 +129,15 @@ const MapDetail: React.FC<MapDetailProps> = ({ id }) => {
     }
   }, [dispatch, listPath])
 
-  useEffect(() => {
-    markersRef.current.forEach((marker, index) => {
-      console.log('marker', marker)
-      marker.on('click', () => {
-        // Xử lý tùy chỉnh khi click vào marker
-        console.log('Đã click vào marker!', listPath[0].history[index])
-      })
-    })
-  }, [dispatch, listPath])
+  // useEffect(() => {
+  //   markersRef.current.forEach((marker, index) => {
+  //     console.log('marker', marker)
+  //     marker.on('click', () => {
+  //       // Xử lý tùy chỉnh khi click vào marker
+  //       console.log('Đã click vào marker!', listPath[0].history[index])
+  //     })
+  //   })
+  // }, [dispatch, listPath])
 
   return <Box ref={mapRef} width='100%' height='100%'></Box>
 }

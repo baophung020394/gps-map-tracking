@@ -140,6 +140,9 @@ function Navbar() {
           borderRadius='50%'
           icon={AddIcon}
           className='btn-add'
+          onClick={() => {
+            console.log('click')
+          }}
         />
       </div>
     </Box>

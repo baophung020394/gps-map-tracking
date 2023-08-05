@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { UserParams } from 'src/models/User'
 
 const initialState: UserParams = {
-  userId: '',
+  id: '',
   atk: '',
   email: '',
   role: '',

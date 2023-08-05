@@ -1,0 +1,64 @@
+@import '../../assets/styles/app.scss';
+
+.room-list {
+  margin: 0 0 16px;
+  .link-channel {
+    text-decoration: none;
+    color: $primary-color;
+    margin: 0 auto 18px;
+    width: 100%;
+    max-width: 368px;
+    border-radius: 10px;
+    background-color: $color-f6f6f6;
+    display: block;
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    &:hover {
+      border: 1px solid $color-da2bff;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__channel {
+    box-sizing: border-box;
+    &__top {
+      padding: 26px 24px 16px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid $color-dbdbdb;
+
+      .left {
+        margin-right: 16px;
+      }
+
+      .right {
+        h3 {
+          color: $primary-color;
+          font-size: $font-16;
+          line-height: $line-height-12;
+          font-weight: $font-weight-semi-bold;
+        }
+      }
+    }
+
+    &__bottom {
+      padding: 16px 24px 26px;
+      display: flex;
+      align-items: center;
+
+      .left {
+        display: flex;
+        align-items: center;
+
+        .channel-user-avatar {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

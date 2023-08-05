@@ -7,7 +7,7 @@ export type SocketResponse<T> = {
   ptGroup: number // address
   result: string
   status: number
-  data: T[]
+  params: T[]
 }
 
 type Data = Record<string, unknown>

@@ -120,15 +120,15 @@ export const createDevice = async (req: Request, res: Response) => {
 
 export const getAllAddressByDeviceId = async (req: Request, res: Response) => {
   try {
-    console.log("req.body", req.body);
     // Giả định rằng userId và role đã được lưu vào req sau khi đi qua middleware xác thực
-    const { userId, role } = req.body;
+    const { userId, role, deviceId } = req.body;
 
+    console.log("req.body", req.body);
     let devices = [];
     if (role === "member") {
       devices = await Device.findAll({ where: { userId: userId } });
     } else if (role === "admin" || role === "super") {
-      devices = await Device.findAll();
+      devices = await Device.findAll({ where: { deviceId: deviceId } });
     } else {
       return res.status(403).json({ error: "Unauthorized access" });
     }

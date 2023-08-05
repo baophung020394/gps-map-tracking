@@ -3,7 +3,7 @@ interface RequestSocket<T> {
   ptCommand?: number
   ptGroup?: number
   result?: string
-  data: T
+  params: T
 }
 
 export default RequestSocket

@@ -100,3 +100,70 @@ img {
 #root {
   height: 100%;
 }
+.channel-avatar {
+  width: $font-60;
+  height: $font-60;
+  max-width: $font-60;
+  max-height: $font-60;
+  border-radius: $font-10;
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: $font-10 !important;
+    border: 1px solid $color-f6f6f6 !important;
+    box-sizing: border-box;
+  }
+}
+
+.channel-user-avatar {
+  width: $font-28;
+  height: $font-28;
+  max-width: $font-28;
+  max-height: $font-28;
+  border-radius: $font-30;
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: $font-30 !important;
+    border: 1px solid $color-f6f6f6 !important;
+    box-sizing: border-box;
+  }
+}
+
+.chat-user-avatar {
+  width: $font-40;
+  height: $font-40;
+  max-width: $font-40;
+  max-height: $font-40;
+  border-radius: 50%;
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 50% !important;
+    border: 1px solid $color-f6f6f6 !important;
+    box-sizing: border-box;
+  }
+}
+
+.chat-user-avatar-join {
+  width: $font-36;
+  height: $font-36;
+  max-width: $font-36;
+  max-height: $font-36;
+  border-radius: 50%;
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 50% !important;
+    border: 1px solid $color-f6f6f6 !important;
+    box-sizing: border-box;
+  }
+}

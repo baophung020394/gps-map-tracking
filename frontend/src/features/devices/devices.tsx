@@ -14,9 +14,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import RequestSocket from 'src/models/Common'
 import { DeviceModel } from 'src/models/device-model'
 import { UserParams } from 'src/models/User'
-// import { io } from 'socket.io-client'
 import './address.scss'
 import Device from './device'
+// import { io } from 'socket.io-client'
 // import { useSocketIO } from '@hooks/useSocket'
 
 type Data = Record<string, unknown>
@@ -33,6 +33,7 @@ interface FormData {
 interface AddressesProps {
   id?: string
 }
+
 const Addresses: React.FC<AddressesProps> = ({ id }) => {
   const { handleSubmit, control, setValue } = useForm<FormData>()
   const [deviceList, setDeviceList] = useState<DeviceModel[]>([])
@@ -127,7 +128,9 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
       const response = await axios.get(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${randomCoordinates.lat}&lon=${randomCoordinates.long}`
       )
+
       console.log('response', response)
+
       const { data } = response
       // Xử lý dữ liệu trả về từ API tại đây
       console.log('Address data:', data)
@@ -152,7 +155,7 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
       const request: RequestSocket<Data> = {
         ptGroup: 12345,
         ptCommand: 12348, // filter 30 day
-        data: {
+        params: {
           userId: userInfo?.id
         }
       }
@@ -165,13 +168,14 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
       const request: RequestSocket<Data> = {
         ptGroup: 12345,
         ptCommand: 12346,
-        data: {
+        params: {
           userId: userInfo?.id
         }
       }
       sendSocketMessage('message', request)
     }
   }
+
   const handleUpdatePositionById = async () => {
     console.log('id', id)
     try {
@@ -209,7 +213,7 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
       const request: RequestSocket<Data> = {
         ptGroup: 12345,
         ptCommand: 12347,
-        data: {
+        params: {
           userId: userInfo?.id
         }
       }
@@ -221,11 +225,11 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
    * Init list address
    */
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && !id) {
       const request: RequestSocket<Data> = {
         ptGroup: 12345,
         ptCommand: 12347,
-        data: {
+        params: {
           id: userInfo?.id,
           role: userInfo?.role
         }
@@ -250,19 +254,19 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
   useEffect(() => {
     if (lastMessage) {
       switch (lastMessage.ptCommand) {
-        // case 12346:
-        //   setAddressList(lastMessage.data)
-        //   dispatch(setAddressListAction(lastMessage.data))
-        //   break
-
         case 12347:
-          setDeviceList(lastMessage.data)
-          dispatch(setAddressListAction(lastMessage.data))
+          setDeviceList(lastMessage.params)
+          dispatch(setAddressListAction(lastMessage.params))
           break
 
         case 12348:
-          setDeviceList(lastMessage.data)
-          dispatch(setAddressListAction(lastMessage.data))
+          setDeviceList(lastMessage.params)
+          dispatch(setAddressListAction(lastMessage.params))
+          break
+
+        case 55555:
+          localStorage.clear()
+          window.location.href = '/'
           break
 
         default:
