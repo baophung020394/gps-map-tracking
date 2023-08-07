@@ -39,6 +39,7 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
   const [deviceList, setDeviceList] = useState<DeviceModel[]>([])
   const [open, setOpen] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
+  const [openError, setOpenError] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const userJSON: string | null = localStorage.getItem('user')
   const userInfo: UserParams | null = userJSON !== null ? JSON.parse(userJSON) : null
@@ -101,7 +102,13 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
   const onSubmit = async (data: FormData) => {
     // Get lat, long từ API
     console.log(data)
-    dispatch(addAddress(data))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dispatchAdd = await dispatch(addAddress(data))
+    console.log('dispatchAdd', dispatchAdd)
+    if (dispatchAdd.payload === 'Failed to send') {
+      setOpenError(true)
+      setOpen(false)
+    }
 
     const getLatLong = getRandomCoordinates(currentLat, currentLong, radiusInKm)
     try {
@@ -313,6 +320,9 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
               <CustomButton text='Add' type='submit' />
             </form>
           </DialogContent>
+        </Dialog>
+        <Dialog open={openError} onClose={() => setOpenError(false)}>
+          <DialogTitle>User with role member can only create one device.</DialogTitle>
         </Dialog>
       </Box>
 

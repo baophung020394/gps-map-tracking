@@ -5,6 +5,7 @@ import { VisibilityOff } from '@mui/icons-material'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import FacebookIcon from '../../../assets/images/login/facebook.svg'
 import GoogleIcon from '../../../assets/images/login/google.svg'
 import LockIcon from '../../../assets/images/login/Lock-bold-icon.svg'
@@ -58,6 +59,12 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
 
         <div className='btn-options'>
           <CustomButton text='Sign in' type='submit' className='btn-login'></CustomButton>
+        </div>
+
+        <div className='btn-options'>
+          <Link to='/signup' title='Sign up'>
+            Sign up
+          </Link>
         </div>
       </form>
 

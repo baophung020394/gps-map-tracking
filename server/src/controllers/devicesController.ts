@@ -216,20 +216,17 @@ export const updatePositionLatest = async (req: Request, res: Response) => {
 
     // Retrieve lat and long data for the given deviceId
     const latLongList = await Latest.findAll({
-      attributes: ["latitude", "longitude"],
+      attributes: ["latitude", "longitude","address","date"],
       where: { deviceId },
     });
 
-    // Send the lat and long data back to the client via socket
-    // (You need to implement this part based on your socket implementation)
-
-    // getSocketServer().emit("message", {
-    //   ptCommand: DeviceCommand.DEVICE_LATEST_LIST,
-    //   ptGroup: GROUP_DEVICE,
-    //   result: "success",
-    //   status: 200,
-    //   data: latLongList,
-    // });
+    getSocketServer().emit("message", {
+      ptCommand: DeviceCommand.DEVICE_LATEST_LIST,
+      ptGroup: GROUP_DEVICE,
+      result: "success",
+      status: 200,
+      params: latLongList,
+    });
 
     return res.status(200).json({ message: "Update success", latLongList });
   } catch (error) {

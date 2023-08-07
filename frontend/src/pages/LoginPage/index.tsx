@@ -6,7 +6,8 @@ import { AppDispatch } from '@stores/index'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import LoginBackground from '../../assets/images/login/bg-login.jpg'
+// import LoginBackground from 'https://static.vecteezy.com/system/resources/previews/007/164/537/original/fingerprint-identity-sensor-data-protection-system-podium-hologram-blue-light-and-concept-free-vector.jpg'
+// import LoginBackground from '../../assets/images/login/bg-login.jpg'
 import './login.scss'
 
 interface FormData {
@@ -28,7 +29,7 @@ const LoginPage: React.FC = () => {
     <Box
       className='login-view'
       style={{
-        backgroundImage: `url(${LoginBackground})`
+        backgroundImage: `url(${`https://static.vecteezy.com/system/resources/previews/007/164/537/original/fingerprint-identity-sensor-data-protection-system-podium-hologram-blue-light-and-concept-free-vector.jpg`})`
       }}
     >
       <LoginForm onSubmit={handleLogin} />

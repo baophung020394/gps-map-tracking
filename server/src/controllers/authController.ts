@@ -8,7 +8,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "keysecret";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { username, email, password, role } = req.body;
+    console.log("req.body", req.body);
+    const { username, email, password, role } = req.body.data;
     const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res.status(400).json({ message: "Email already registered." });
@@ -18,8 +19,15 @@ export const register = async (req: Request, res: Response) => {
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
       expiresIn: "1h",
     });
-
-    return res.status(201).json({ token });
+    const cloneData = { ...user.dataValues };
+    cloneData.atk = token;
+    return res.status(201).json({
+      ptGroup: 44567,
+      ptCommand: 44569,
+      token: token,
+      params: cloneData,
+      result: "success",
+    });
   } catch (error: any) {
     return res.status(500).json({ message: error.message });
   }

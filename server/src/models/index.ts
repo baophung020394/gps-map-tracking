@@ -6,6 +6,7 @@ import LatestModel from "./latest";
 import UserModel from "./user";
 import RoomModel from "./room";
 import UserRoomModel from "./user-room";
+import MessageModel from "./message";
 
 const sequelize = new Sequelize(
   process.env.DB_DATABASE as string,
@@ -25,6 +26,7 @@ const Latest = LatestModel(sequelize);
 const User = UserModel(sequelize);
 const Room = RoomModel(sequelize);
 const UserRoom = UserRoomModel(sequelize);
+const Message = MessageModel(sequelize);
 
 Device.hasMany(History, { foreignKey: "deviceId" });
 Device.hasMany(HistoryLast, { foreignKey: "deviceId" });
@@ -32,6 +34,7 @@ Device.hasMany(Latest, { foreignKey: "deviceId" });
 History.belongsTo(Device, { foreignKey: "deviceId" });
 HistoryLast.belongsTo(Device, { foreignKey: "deviceId" });
 HistoryLast.belongsTo(Device, { foreignKey: "deviceId" });
+// Message.belongsTo(Room, { foreignKey: "roomId" });
 Latest.belongsTo(Device, { foreignKey: "deviceId" });
 User.hasOne(Device, { foreignKey: "userId", as: "device" });
 Device.belongsTo(User, { foreignKey: "userId" });
@@ -44,4 +47,4 @@ sequelize.sync({ force: false }).then(async () => {
   console.log(`Database & tables created!`);
 });
 
-export { User, Room, UserRoom, Device, Latest, History, HistoryLast };
+export { User, Room, Message, UserRoom, Device, Latest, History, HistoryLast };

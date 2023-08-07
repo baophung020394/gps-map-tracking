@@ -6,7 +6,9 @@ interface MessageAttributes extends Model {
   content: string;
   image: string | null;
   file: string | null;
-  roomId: number;
+  roomId: string;
+  userId: string;
+  date: Date;
 }
 
 export default (sequelize: Sequelize) => {
@@ -22,17 +24,46 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      image: {
+      // image: {
+      //   type: DataTypes.STRING,
+      //   allowNull: true,
+      // },
+      // file: {
+      //   type: DataTypes.STRING,
+      //   allowNull: true,
+      // },
+      attachment: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      file: {
+      messageType: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
+      },
+      chatType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      senderId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      senderName: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       roomId: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.STRING,
         allowNull: false,
+      },
+      date: {
+        type: DataTypes.DATE, // Định nghĩa trường date với kiểu dữ liệu DATE
+        allowNull: false,
+        defaultValue: DataTypes.NOW, // Gán giá trị mặc định là thời điểm hiện tại
       },
     },
     {

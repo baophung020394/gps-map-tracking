@@ -4,8 +4,11 @@ import React, { useState } from 'react'
 import { Control, Controller } from 'react-hook-form'
 
 interface FormData {
-  email: string | ''
-  password: string | ''
+  email: string
+  password: string
+  passwordConfirm?: string
+  username?: string
+  role?: string | 'member'
 }
 
 interface InputFieldLoginFormProps {

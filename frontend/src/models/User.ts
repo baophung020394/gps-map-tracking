@@ -4,6 +4,7 @@ export interface UserParams {
   email: string
   role: string
   isAuthenticated: boolean
+  username: string
 }
 
 export interface LoginResponse {

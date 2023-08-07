@@ -29,7 +29,7 @@ export default (sequelize: Sequelize) => {
     "Room",
     {
       id: {
-        type: DataTypes.UUID, // Sử dụng kiểu UUID cho cột id
+        type: DataTypes.STRING, // Sử dụng kiểu UUID cho cột id
         defaultValue: () => generateRandomString(), // Tạo giá trị mặc định là UUID ngẫu nhiên khi thêm mới bản ghi
         primaryKey: true,
       },

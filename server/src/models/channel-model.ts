@@ -76,6 +76,7 @@ export interface AuthLogoutMessage {
 
 export interface MessageRoomModel {
   userId?: string;
+  senderName?: string;
   roomId: string;
   roomName: string;
   roomProfileImage?: string;
@@ -89,7 +90,7 @@ export interface MessageRoomResponse {
   params?: MessageRoomModel | Record<string, unknown>;
 }
 
-export interface MessageMessage {
+export interface MessageModel {
   ptCommand: any; // You can define the type for this as needed
   ptGroup: typeof GROUP_MESSAGE_CHAT;
   roomId?: string;
@@ -121,16 +122,16 @@ export interface MessageListMessage {
   roomId?: string;
   count?: number;
   result?: string;
-  params?: MessageMessage[] | Record<string, unknown>;
+  params?: MessageModel[] | Record<string, unknown>;
 }
 
-export interface MessageListMessage {
+export interface MessageListResponse {
   ptCommand: any; // You can define the type for this as needed
-  ptGroup: typeof GROUP_MESSAGE_LIST;
+  ptGroup: typeof GROUP_MESSAGE_CHAT;
   roomId?: string;
   count?: number;
   result?: string;
-  params?: MessageMessage[] | Record<string, unknown>;
+  params?: MessageModel | Record<string, unknown>;
 }
 
 export type SocketMessage =
@@ -144,4 +145,5 @@ export type SocketMessage =
   | DeleteDeviceMessage
   | MessageRoomResponse
   | MessageListMessage
-  | MessageMessage;
+  | MessageListResponse
+  | MessageModel;

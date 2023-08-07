@@ -9,11 +9,10 @@ export interface MessageModel {
   ownerId?: string
   staffMsg?: string
   title?: string
-  message?: string
+  content?: string
   attachment_more?: string
   email_crtfc?: string
-  reg_date: string
-  regDate: string
+  date?: string
   senderName?: string
   senderId?: string
   messageType?: MessageTypeValue

@@ -5,6 +5,7 @@ import ChatPage from '@pages/ChatPage'
 import LoginPage from '@pages/LoginPage'
 import MapDetailPage from '@pages/MapDetailPage'
 import MapPage from '@pages/MapPage'
+import RegisterPage from '@pages/RegisterPage'
 import { setUser } from '@stores/userSlice'
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
@@ -29,6 +30,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/login' element={<PublicRoute element={<LoginPage />} />} />
+        <Route path='/signup' element={<PublicRoute element={<RegisterPage />} />} />
         <Route path='/maps' element={<PrivateRoute element={<BaseMapPage />} />} />
         <Route path='/maps/:id' element={<PrivateRoute element={<BaseMapDetailPage />} />} />
         <Route path='/chats' element={<PrivateRoute element={<BaseMessagesPage />} />} />

@@ -113,7 +113,9 @@ module.exports = (env, argv) => {
         filename: isProduction ? 'static/css/[name].[contenthash:6].css' : '[name].css'
       }),
       // Dùng biến môi trường env trong dự án
-      new Dotenv(),
+      new Dotenv({
+        path: isProduction ? './.env.production' : './.env.development',
+      }),
       // Copy mọi files trong folder public trừ file index.html
       new CopyWebpackPlugin({
         patterns: [

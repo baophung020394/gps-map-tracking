@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { Socket } from "socket.io";
+import { format } from "date-fns";
 import {
   AuthCommand,
   AUTH_GROUP,
@@ -9,9 +10,16 @@ import {
   GROUP_MESSAGE_LIST,
   MessageCommand,
 } from "../constants/message-constant";
-import { Device, History, HistoryLast, Latest, UserRoom } from "../models";
 import {
-  MessageMessage,
+  Device,
+  History,
+  HistoryLast,
+  Latest,
+  Message,
+  UserRoom,
+} from "../models";
+import {
+  MessageModel,
   MessageRoomModel,
   MessageRoomResponse,
   SocketMessage,
@@ -144,6 +152,8 @@ const handleJoinRoom = async (socket: Socket, data: SocketMessage) => {
         return;
       }
 
+      console.log("join socket");
+
       // Tiến hành join vào phòng bằng socket.io
       socket.join(roomId);
 
@@ -159,13 +169,40 @@ const handleJoinRoom = async (socket: Socket, data: SocketMessage) => {
       // Thêm userId vào bảng UserRoom
       await UserRoom.create({ userId, roomId });
 
-      // Gửi thông báo thành công cho client
-      socket.emit("message", {
-        ptCommand: MessageCommand.JOIN_ROOM,
-        ptGroup: GROUP_MESSAGE_LIST,
-        result: "success",
-        roomId: roomId,
+      // Kiểm tra xem userId đã có tin nhắn trong phòng hay chưa
+      const userInfor = await User.findOne({
+        where: {
+          id: userId,
+        },
       });
+
+      const existingMessage = await Message.findOne({
+        where: {
+          roomId: roomId,
+          userId: userId,
+        },
+      });
+
+      if (!existingMessage) {
+        // Nếu chưa có tin nhắn, thêm tin nhắn mới vào bảng Message
+        const newMessage = await Message.create({
+          userId: userId,
+          roomId: roomId,
+          senderId: userId,
+          senderName: userInfor?.dataValues.username,
+          content: "",
+          messageType: "50",
+          chatType: "50",
+        });
+
+        // Gửi thông báo thành công cho client
+        getSocketServer().to(roomId).emit("message", {
+          ptCommand: MessageCommand.JOIN_ROOM,
+          ptGroup: GROUP_MESSAGE_LIST,
+          result: "success",
+          params: newMessage,
+        });
+      }
     }
   } catch (error) {
     console.error("Error:", error);
@@ -246,7 +283,13 @@ const handleCreateRoom = async (
         ptCommand: MessageCommand.CREATE_ROOM, // Trả về lại ptCommand của yêu cầu tạo phòng
         ptGroup: GROUP_MESSAGE_LIST, // Trả về lại ptGroup của yêu cầu tạo phòng
         result: "success",
-        roomId: newRoomId, // Mã phòng đã tạo thành công
+        params: {
+          roomName: roomName,
+          roomId: newRoomId,
+          roomDescription,
+          roomProfileImage,
+          userId: ownerId,
+        }, // Mã phòng đã tạo thành công
       };
 
       socket.emit("message", responseCreateRoom);
@@ -288,8 +331,6 @@ const handleFetchRooms = async (socket: Socket, data: SocketMessage) => {
 
   try {
     if ("params" in data && data.params instanceof Object) {
-      const params = data.params as MessageRoomModel;
-      const { userId } = params;
       const rooms = await Room.findAll();
 
       // Tạo một mảng mới chứa thông tin về từng phòng để gửi về cho client
@@ -418,6 +459,134 @@ const handleCheckUserInRoom = async (socket: Socket, data: SocketMessage) => {
   }
 };
 
+const handleSendMessage = async (socket: Socket, data: SocketMessage) => {
+  // Kiểm tra và xác thực token của client
+  if (!isSocketAuthenticated(socket, data.ptGroup, data.ptCommand)) {
+    socket.emit("message", {
+      ptCommand: 55555,
+      ptGroup: 55554,
+      result: "Unauthorized",
+    });
+    return;
+  }
+  try {
+    if ("params" in data) {
+      const params = data.params as MessageModel;
+      const { senderId, message, roomId, senderName, messageType, chatType } =
+        params;
+
+      // Lưu tin nhắn vào cơ sở dữ liệu (ví dụ: RoomMessage là model cho bảng chứa tin nhắn)
+      if (roomId) {
+        const currentDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+        const newMessage = await Message.create({
+          userId: senderId,
+          senderId,
+          senderName,
+          roomId: roomId,
+          content: message,
+          messageType,
+          chatType,
+          attachment: "",
+          date: currentDate,
+        });
+
+        // Gửi tin nhắn đã lưu về cho tất cả các client trong phòng (bao gồm cả client gửi tin nhắn)
+        getSocketServer().to(roomId).emit("message", {
+          ptCommand: MessageCommand.SEND_MESSAGE_ALL_TO_ROOM, // Trả về lại ptCommand của yêu cầu gửi tin nhắn
+          ptGroup: GROUP_MESSAGE_CHAT, // Trả về lại ptGroup của yêu cầu gửi tin nhắn
+          result: "success",
+          params: newMessage.dataValues, // Tin nhắn đã lưu vào cơ sở dữ liệu
+        });
+      } else {
+        socket.emit("message", {
+          ptCommand: MessageCommand.SEND_MESSAGE_ALL_TO_ROOM,
+          ptGroup: GROUP_MESSAGE_CHAT,
+          result: "error",
+          error: "RoomId not found",
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    socket.emit("message", {
+      ptCommand: MessageCommand.SEND_MESSAGE_ALL_TO_ROOM,
+      ptGroup: GROUP_MESSAGE_CHAT,
+      result: "error",
+      error: "Error while checking user in room.",
+    });
+  }
+};
+
+/**
+ * Handle fetch messages for a specific user and room
+ * @param socket
+ * @param data
+ * @returns
+ */
+const handleFetchMessage = async (socket: Socket, data: SocketMessage) => {
+  // Kiểm tra và xác thực token của client
+  if (!isSocketAuthenticated(socket, data.ptGroup, data.ptCommand)) {
+    socket.emit("message", {
+      ptCommand: 55555,
+      ptGroup: 55554,
+      result: "Unauthorized",
+    });
+    return;
+  }
+
+  try {
+    if ("params" in data && data.params instanceof Object) {
+      const params = data.params as { userId: string; roomId: string };
+      const { userId, roomId } = params;
+
+      // Tìm kiếm bản ghi trong bảng UserRoom dựa vào userId và roomId
+      const userRoom = await UserRoom.findOne({
+        where: { userId, roomId },
+      });
+
+      // Nếu không tồn tại bản ghi, tức là người dùng chưa tham gia phòng này
+      if (!userRoom) {
+        socket.emit("message", {
+          ptCommand: MessageCommand.FETCH_MESSAGES,
+          ptGroup: GROUP_MESSAGE_CHAT,
+          result: "error",
+          error: "User is not a member of this room.",
+        });
+        return;
+      }
+
+      // Tiến hành join vào phòng bằng socket.io
+      socket.join(roomId);
+
+      // Lấy danh sách tin nhắn của người dùng trong phòng từ bảng Message
+      // const messages = await Message.findAll({
+      //   where: {
+      //     roomId: roomId,
+      //     userId: userId,
+      //   },
+      // });
+      const messages = await Message.findAll({
+        where: { roomId: roomId },
+      });
+      // Gửi danh sách tin nhắn về cho client
+      socket.emit("message", {
+        ptCommand: MessageCommand.FETCH_MESSAGES,
+        ptGroup: GROUP_MESSAGE_CHAT,
+        result: "success",
+        params: messages,
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    socket.emit("message", {
+      ptCommand: MessageCommand.FETCH_MESSAGES,
+      ptGroup: GROUP_MESSAGE_CHAT,
+      result: "error",
+      error: "Error while fetching messages for the user and room.",
+    });
+  }
+};
+
 // Handle the socket message event
 const handleSocketMessage = async (
   socket: Socket,
@@ -425,7 +594,7 @@ const handleSocketMessage = async (
   callback?: (response: any) => void
 ) => {
   console.log("handleSocketMessage");
-  const rooms: Record<string, { users: string[]; messages: MessageMessage[] }> =
+  const rooms: Record<string, { users: string[]; messages: MessageModel[] }> =
     {};
   const token = socket.handshake.auth.token as string;
   if (!validTokens.has(token)) {
@@ -665,35 +834,10 @@ const handleSocketMessage = async (
       case GROUP_MESSAGE_CHAT:
         switch (data.ptCommand) {
           case MessageCommand.SEND_MESSAGE:
-            if (roomId) {
-              const message: MessageMessage = {
-                ptCommand: data.ptCommand,
-                ptGroup: data.ptGroup,
-                result: data.result,
-                message: data.message || "",
-                attachment: data.attachment || "",
-                messageType: data.messageType || "0",
-                chatType: data.chatType,
-                txtType: data.txtType,
-                ownerId: data.senderId,
-                staffMsg: data.staffMsg,
-                title: data.title,
-                attachment_more: "",
-                email_crtfc: "",
-                reg_date: data.reg_date,
-                regDate: data.regDate,
-                senderName: data.senderName,
-                senderId: data.senderId,
-                message_more: "",
-                blinded: "",
-                cId: "",
-              };
-
-              if (rooms[roomId]) {
-                rooms[roomId].messages.push(message);
-                io.to(roomId).emit("message", message);
-              }
-            }
+            handleSendMessage(socket, data);
+            break;
+          case MessageCommand.FETCH_MESSAGES:
+            handleFetchMessage(socket, data);
             break;
 
           default:
