@@ -52,15 +52,12 @@ const isSocketAuthenticated = (
   }
 
   const token = socket.handshake.auth.token;
-  console.log("tokenserver", token);
   if (!token) {
-    console.log("token null", token);
     return false;
   }
 
   try {
     const verifytoken = jwt.verify(token, JWT_SECRET);
-    console.log("verifytoken", verifytoken);
     return true;
   } catch (error) {
     return false;
@@ -76,7 +73,7 @@ export const initSocketServer = (httpServer: any) => {
 
   io.on("connection", (socket: Socket) => {
     console.log(`Client ${socket.id} connected`);
-    console.log("Handshake auth data:", socket.handshake.auth);
+    // console.log("Handshake auth data:", socket.handshake.auth);
 
     socket.on(
       "message",
@@ -241,8 +238,8 @@ const handleCreateRoom = async (
     // Lưu thông tin phòng vào cơ sở dữ liệu
     if ("params" in data && data.params instanceof Object) {
       const params = data.params as MessageRoomModel;
-      const { userId, roomId, roomName, roomDescription, roomProfileImage } =
-        params;
+      const { userId, roomName, roomDescription, roomProfileImage } = params;
+
       // Kiểm tra xem tên phòng có tồn tại trong cơ sở dữ liệu hay không
       const existingRoom = await Room.findOne({
         where: {
@@ -263,8 +260,8 @@ const handleCreateRoom = async (
       // Tạo phòng mới trong cơ sở dữ liệu
       const newRoom = await Room.create({
         roomName: roomName,
-        roomType: "group", // Chọn loại phòng (group, channel, chat_1_1) tùy thuộc vào yêu cầu của bạn
-        roomProfileImage: roomProfileImage || null,
+        roomType: "channel", // Chọn loại phòng (group, channel, chat_1_1) tùy thuộc vào yêu cầu của bạn
+        roomProfileImage: roomProfileImage || "roomProfileImage",
         roomDescription: roomDescription,
         userId: userId,
       });
@@ -283,11 +280,12 @@ const handleCreateRoom = async (
         ptCommand: MessageCommand.CREATE_ROOM, // Trả về lại ptCommand của yêu cầu tạo phòng
         ptGroup: GROUP_MESSAGE_LIST, // Trả về lại ptGroup của yêu cầu tạo phòng
         result: "success",
+        roomId: newRoomId,
         params: {
-          roomName: roomName,
+          roomName: newRoom.getDataValue("roomName"),
           roomId: newRoomId,
-          roomDescription,
-          roomProfileImage,
+          roomDescription: newRoom.getDataValue("roomDescription"),
+          roomProfileImage: newRoom.getDataValue("roomProfileImage"),
           userId: ownerId,
         }, // Mã phòng đã tạo thành công
       };
@@ -593,12 +591,10 @@ const handleSocketMessage = async (
   data: SocketMessage,
   callback?: (response: any) => void
 ) => {
-  console.log("handleSocketMessage");
   const rooms: Record<string, { users: string[]; messages: MessageModel[] }> =
     {};
   const token = socket.handshake.auth.token as string;
   if (!validTokens.has(token)) {
-    console.log("token null");
     if (typeof callback === "function") {
       return callback({ error: "Unauthorized" });
     }
@@ -611,7 +607,7 @@ const handleSocketMessage = async (
       case GROUP_DEVICE:
         switch (data.ptCommand) {
           case DeviceCommand.DEVICE_LIST:
-            console.log("Đã nhận ptGroup", data);
+            // console.log("Đã nhận ptGroup", data);
             const devices = await Device.findAll({
               include: [
                 {
@@ -641,7 +637,7 @@ const handleSocketMessage = async (
             break;
 
           case DeviceCommand.DEVICE_LATEST_LIST:
-            console.log("Đã nhận ptGroup", data);
+            // console.log("Đã nhận ptGroup", data);
             try {
               // console.log("data", data);
               const { id, role } = data.params; // Giả định các thông tin user và role được gửi từ client

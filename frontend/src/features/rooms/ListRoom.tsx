@@ -13,9 +13,9 @@ const ListRoom: React.FC<ListRoomProps> = ({ roomList }) => {
 
   return (
     <Box className='room-list'>
-      {roomList.map((room: RoomModel, index: number) => (
-        <Room key={`${room.roomId}-${index}`} room={room} />
-      ))}
+      {roomList?.length > 0
+        ? roomList.map((room: RoomModel, index: number) => <Room key={`${room.roomId}-${index}`} room={room} />)
+        : null}
     </Box>
   )
 }

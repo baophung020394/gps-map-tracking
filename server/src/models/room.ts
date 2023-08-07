@@ -1,5 +1,5 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
-
+import { v4 as uuidv4 } from "uuid";
 interface RoomAttributes extends Model {
   id: string;
   roomName: string;
@@ -30,7 +30,7 @@ export default (sequelize: Sequelize) => {
     {
       id: {
         type: DataTypes.STRING, // Sử dụng kiểu UUID cho cột id
-        defaultValue: () => generateRandomString(), // Tạo giá trị mặc định là UUID ngẫu nhiên khi thêm mới bản ghi
+        defaultValue: () => uuidv4(), // Tạo giá trị mặc định là UUID ngẫu nhiên khi thêm mới bản ghi
         primaryKey: true,
       },
       roomName: {
@@ -47,10 +47,12 @@ export default (sequelize: Sequelize) => {
       roomProfileImage: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
       roomDescription: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
       userId: {
         type: DataTypes.INTEGER,

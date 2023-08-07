@@ -5,7 +5,7 @@ import { AppDispatch } from '@stores/index'
 // import { setUser } from '@stores/userSlice'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-// import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 // import LoginBackground from 'https://static.vecteezy.com/system/resources/previews/007/164/537/original/fingerprint-identity-sensor-data-protection-system-podium-hologram-blue-light-and-concept-free-vector.jpg'
 // import LoginBackground from '../../assets/images/login/bg-login.jpg'
 import './register.scss'
@@ -20,7 +20,7 @@ interface FormData {
 
 const RegisterPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const handleRegister = async (data: FormData) => {
     console.log('data', data)

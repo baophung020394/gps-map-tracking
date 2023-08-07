@@ -158,7 +158,6 @@ const ChatPage: React.FC = () => {
             setRoomList((prevRoomList) => [...prevRoomList, lastMessage.params[0]])
           } else {
             const roomInfo = lastMessage.params as RoomModel
-            // setIsOpenPopupJoin(roomInfo.inRoom || false)
             setIsOpenCreateRoom(false)
             setRoomList((prevRoomList) => [...prevRoomList, roomInfo])
           }
