@@ -1,0 +1,36 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        cd gps-map-tracking/frontend
+        yarn install
+        cd ../server
+        npm install
+
+    - name: Pull latest code
+      run: |
+        cd gps-map-tracking
+        git pull origin main
+
+    - name: Start frontend
+      run: |
+        cd gps-map-tracking/frontend
+        yarn dev
+
+    - name: Start server
+      run: |
+        cd gps-map-tracking/server
+        npm start
