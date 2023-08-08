@@ -23,7 +23,7 @@ const Chatbar: React.FC = () => {
         />
         <Box className='chat-room__bar__left__infor'>
           <Typography variant='h3' component='h3'>
-            {currentChat?.roomName}
+            {currentChat?.roomName} - Test ci/cd
           </Typography>
           <Typography component='p'>
             Created by <Typography component='span'>{currentChat?.userId}</Typography>
