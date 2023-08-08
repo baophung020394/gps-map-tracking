@@ -12,7 +12,17 @@ import jwt from "jsonwebtoken";
 
 // Khởi tạo Redis client
 const app = express();
-app.use(cors());
+// Cấu hình CORS chỉ cho phép yêu cầu từ địa chỉ IP cụ thể
+const allowedOrigins = ['http://192.168.64.11:5006'];
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 app.use(bodyParser.json());
 
 // Khởi tạo socket
