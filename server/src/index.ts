@@ -20,7 +20,7 @@ const httpServer = createServer(app);
 initSocketServer(httpServer);
 
 const redisClient = redis.createClient({
-  url: "redis://192.168.64.11:6379",
+  url: "redis://144.126.240.194:6379",
   legacyMode: true,
 });
 
