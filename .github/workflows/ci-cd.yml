@@ -15,25 +15,25 @@ jobs:
 
       - name: Install frontend dependencies
         run: |
-          cd $GITHUB_WORKSPACE/gps-map-tracking/frontend
+          cd $GITHUB_WORKSPACE/frontend
           yarn install
 
       - name: Install server dependencies
         run: |
-          cd $GITHUB_WORKSPACE/gps-map-tracking/server
+          cd $GITHUB_WORKSPACE/server
           npm install
 
       - name: Pull latest code
         run: |
-          cd $GITHUB_WORKSPACE/gps-map-tracking
+          cd $GITHUB_WORKSPACE
           git pull origin main
 
       - name: Start frontend
         run: |
-          cd $GITHUB_WORKSPACE/gps-map-tracking/frontend
+          cd $GITHUB_WORKSPACE/frontend
           yarn dev
 
       - name: Start server
         run: |
-          cd $GITHUB_WORKSPACE/gps-map-tracking/server
+          cd $GITHUB_WORKSPACE/server
           npm start
