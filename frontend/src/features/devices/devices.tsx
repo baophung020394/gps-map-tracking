@@ -44,6 +44,10 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
   const userJSON: string | null = localStorage.getItem('user')
   const userInfo: UserParams | null = userJSON !== null ? JSON.parse(userJSON) : null
   const token: string | null = localStorage.getItem('token')
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_SOCKET_DEV
+      : process.env.REACT_APP_API_URL_SOCKET_PROD
   // test google map
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const currentMap = useSelector((state: RootState) => state.map.currentMap)
@@ -70,7 +74,7 @@ const Addresses: React.FC<AddressesProps> = ({ id }) => {
     [handleOpenSocket, handleCloseSocket, handleMessage]
   )
 
-  const { lastMessage, sendSocketMessage } = useSocketIO('http://localhost:5005', options, token ?? '')
+  const { lastMessage, sendSocketMessage } = useSocketIO(apiUrl ?? '', options, token ?? '')
 
   function getRandomCoordinates(lat: number, long: number, radiusInKm: number): { lat: number; long: number } {
     // Earth radius in km

@@ -61,7 +61,7 @@ const ChatPage: React.FC = () => {
     [handleOpenSocket, handleCloseSocket, handleMessage]
   )
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { lastMessage, sendSocketMessage } = useSocketIO('http://localhost:5005', options, token ?? '')
+  const { lastMessage, sendSocketMessage } = useSocketIO('http://192.168.64.10:5005', options, token ?? '')
   const castedLastMessage = lastMessage as SocketResponse<MessageModel[]> | null
 
   const handleClosePopupJoin = () => setIsOpenPopupJoin(false)
