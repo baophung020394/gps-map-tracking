@@ -35,7 +35,10 @@ const ChatPage: React.FC = () => {
   const token: string | null = localStorage.getItem('token')
   const currentChat = useSelector((state: RootState) => state.chat.currentChat)
   const { id } = useParams()
-
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_SOCKET_DEV
+      : process.env.REACT_APP_API_URL_SOCKET_PROD
   // test google map
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOpenSocket = useCallback(() => {
@@ -61,7 +64,7 @@ const ChatPage: React.FC = () => {
     [handleOpenSocket, handleCloseSocket, handleMessage]
   )
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { lastMessage, sendSocketMessage } = useSocketIO('http://192.168.64.10:5005', options, token ?? '')
+  const { lastMessage, sendSocketMessage } = useSocketIO(apiUrl ?? '', options, token ?? '')
   const castedLastMessage = lastMessage as SocketResponse<MessageModel[]> | null
 
   const handleClosePopupJoin = () => setIsOpenPopupJoin(false)
