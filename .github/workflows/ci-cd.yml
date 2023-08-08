@@ -10,27 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: |
-        cd gps-map-tracking/frontend
-        yarn install
-        cd ../server
-        npm install
+      - name: Install frontend dependencies
+        run: |
+          cd $GITHUB_WORKSPACE/gps-map-tracking/frontend
+          yarn install
 
-    - name: Pull latest code
-      run: |
-        cd gps-map-tracking
-        git pull origin main
+      - name: Install server dependencies
+        run: |
+          cd $GITHUB_WORKSPACE/gps-map-tracking/server
+          npm install
 
-    - name: Start frontend
-      run: |
-        cd gps-map-tracking/frontend
-        yarn dev
+      - name: Pull latest code
+        run: |
+          cd $GITHUB_WORKSPACE/gps-map-tracking
+          git pull origin main
 
-    - name: Start server
-      run: |
-        cd gps-map-tracking/server
-        npm start
+      - name: Start frontend
+        run: |
+          cd $GITHUB_WORKSPACE/gps-map-tracking/frontend
+          yarn dev
+
+      - name: Start server
+        run: |
+          cd $GITHUB_WORKSPACE/gps-map-tracking/server
+          npm start
